@@ -9,7 +9,7 @@ pip install -r requirements.txt
 ```
 
 ```
-cd /socketclientsever
+cd socketclientsever
 ```
 
 ```python
