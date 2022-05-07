@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket client</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+        integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div style="display: flex;justify-content: space-between;">
+
+        <video autoplay="true" id="video"></video>
+        <canvas id="canvas" style="overflow:auto" hidden></canvas>
+        <img src="" id="result">
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function (event) {
+            var socket;
+            var fps = 10;
+            // The http vs. https is important. Use http for localhost!
+            socket = io.connect('http://' + document.domain + ':' + location.port);
+
+            var video = document.querySelector("#video");
+            if (navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function (stream) {
+                        video.srcObject = stream;
+                    })
+                    .catch(function (error) {
+                        console.log("Something went wrong!");
+                    });
+            }
+            setInterval(() => {
+                var heightvideo = document.getElementById('video').videoHeight;
+                var widthvideo = document.getElementById('video').videoWidth;
+                var canvas = document.getElementById('canvas');
+                var video = document.getElementById('video');
+                canvas.width = widthvideo;
+                canvas.height = heightvideo;
+                canvas.getContext('2d').drawImage(video, 0, 0, widthvideo, heightvideo);
+                data = canvas.toDataURL();
+                // Gửi dữ liệu
+                socket.emit('send_message', { 'data': data });
+            }, 1000 / fps);
+
+            // nhận dữ liệu
+            socket.on('message_from_server', function (data) {
+                var img = "data:image/png;base64," + String(data.result).split("'")[1]
+                document.getElementById('result').src = img
+            });
+        });
+
+    </script>
+</body>
+
+</html>
