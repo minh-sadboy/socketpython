@@ -4,7 +4,7 @@ Used:
 
 pip install -r requirements.txt
 
-```ruby
+```pip
 require 'redcarpet'
 markdown = Redcarpet.new("Hello World!")
 puts markdown.to_html
